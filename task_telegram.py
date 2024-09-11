@@ -179,9 +179,9 @@ async def task_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = ReplyKeyboardMarkup(
         options,
         input_field_placeholder=None,
-        one_time_keyboard=True, # Requests clients to hide the keyboard as soon as it’s been used
-        is_persistent=False,    # Requests clients to always show the keyboard when the regular keyboard is hidden
-        resize_keyboard=True    # Requests clients to resize the keyboard vertically for optimal fit
+        one_time_keyboard=False, # Requests clients to hide the keyboard as soon as it’s been used
+        is_persistent=True,      # Requests clients to always show the keyboard when the regular keyboard is hidden
+        resize_keyboard=True     # Requests clients to resize the keyboard vertically for optimal fit
     )
 
     await update.message.reply_text("✅ Tasks updated", reply_markup=reply_markup)
