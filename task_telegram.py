@@ -41,6 +41,7 @@ info - current setup
 clear - clear memory
 agent - toggle agent mode
 restart - restarts everything
+start - loads tools keyboard
 """
 
 yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "task_telegram.yaml")
@@ -169,6 +170,7 @@ async def task_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             i = 0
             options.append(choices)
             choices = []
+            continue
         i += 1
 
     if len(choices) > 0:
@@ -182,7 +184,7 @@ async def task_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         resize_keyboard=True    # Requests clients to resize the keyboard vertically for optimal fit
     )
 
-    await update.message.reply_text("Please choose:", reply_markup=reply_markup)
+    await update.message.reply_text("✅ Tasks updated", reply_markup=reply_markup)
 
 
 async def handle_voice(update: Update, context: CallbackContext):
