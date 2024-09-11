@@ -1,0 +1,12 @@
+telegram:
+    token: 123
+
+deepgram:
+    api_key: 123
+
+bobik:
+    users:
+        - name: telegram_username
+          config: bobik_yaml_config_file.yaml
+    helper:
+        config: bobik_dumb.yaml
