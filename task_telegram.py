@@ -113,7 +113,7 @@ async def handle_respone(user: str, question: str):
             return ["Sorry, I broke. 😢"]
 
         format_prompt = format_response_prompt(response)
-        response = await bobik('helper').answer(questions=[format_prompt])
+        response = await bobik('helper').answer(questions=["gpt " + format_prompt])
         print(response)
         answers = extract_and_split(text=response)
 
@@ -137,10 +137,8 @@ async def respond(answers: list, update: Update):
             print("failed html reply err:", e)
             await update.message.reply_text(text)
 
-
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_message_txt(text: str, update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type: str = update.message.chat.type
-    text: str = update.message.text
     print(f'User ({update.message.chat.id}) in {message_type}: "{text}"')
 
     try:
@@ -156,6 +154,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         answers = [f"Error: {e}"]
 
     await respond(answers, update)
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await handle_message_txt(update.message.text, update, context)
 
 async def task_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user.username
@@ -185,6 +186,25 @@ async def task_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     await update.message.reply_text("✅ Tasks updated", reply_markup=reply_markup)
+
+
+async def handle_image(update: Update, context: CallbackContext):
+    photo = update.message.photo
+    if photo:
+        photo_file = await context.bot.get_file(update.message.photo[-1].file_id)
+        message = "summarize this image description"
+        if update.message.caption:
+            message = update.message.caption
+    else:
+        await update.message.reply_text(f"Not a image. I dont know how to process it yet.")
+        return
+
+    helper = bobik('helper')
+    helper.get_manager().clear_memory()
+    response = await helper.answer(questions=[f"gpt4o llm describe in detail this image {photo_file.file_path}"])
+
+    prompt = f"{message}. Detailed image description: {response}"
+    await handle_message_txt(prompt, update, context)
 
 
 async def handle_voice(update: Update, context: CallbackContext):
@@ -277,6 +297,7 @@ def main() -> None:
     # Messages
     app.add_handler(MessageHandler(filters.TEXT, handle_message))
     app.add_handler(MessageHandler(filters.VOICE, handle_voice))
+    app.add_handler(MessageHandler(filters.PHOTO, handle_image))
 
     # Errors
     app.add_error_handler(error)

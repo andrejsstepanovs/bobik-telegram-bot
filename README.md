@@ -46,3 +46,20 @@ sudo supervisorctl stop bobik-telegram-bot
 sudo supervisorctl restart bobik-telegram-bot
 sudo supervisorctl tail bobik-telegram-bot
 ```
+
+# Remember functionality
+Cronjob crawls user history file (if enabled) and finds relevant short and long term information about the user.
+This information is summarized and stored in special prompt that is fed back to the bobik.
+This feedback loop will keep user information up to date.
+
+## Setup
+enable in `task_telegram.yaml` file for each user:
+```
+    remember:
+        enabled: true
+        use_model: sonnet
+        use_model_summary: opus
+        target: /home/ubuntu/bobik/prompts/user/remember_knowledge.md
+```
+
+and configure this target prompt (`remember_knowledge.md`) in bobik user config file. 

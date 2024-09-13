@@ -8,5 +8,8 @@ bobik:
     users:
         - name: telegram_username
           config: bobik_yaml_config_file.yaml
+          use_model: sonnet
+          use_model_summary: opus
+          target: /path/to/prompts/remember_knowledge.md
     helper:
         config: bobik_dumb.yaml
