@@ -59,7 +59,9 @@ def bobik(user: str) -> App:
         return _bobik_apps[user]
 
     def app_factory(config: str) -> App:
-        return App(config_file=os.path.join(current_dir, config))
+        app = App(config_file=os.path.join(current_dir, config))
+        app.state.is_quiet = True
+        return app
 
     _bobik_apps['helper'] = app_factory(config['bobik']['helper']['config'])
     for u in config['bobik']['users']:
