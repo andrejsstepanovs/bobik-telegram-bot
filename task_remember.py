@@ -51,6 +51,7 @@ def main() -> None:
         ai_name: str = app.settings.agent.name
 
         history_file: str = app.settings.history.file
+        history_file = os.path.join(current_dir, history_file)
         if not os.path.exists(history_file):
             print(f"User {u['name']} history file {file} missing")
             continue
