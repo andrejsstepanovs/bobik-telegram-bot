@@ -10,16 +10,17 @@ Follow these instructions to format the text:
   - <code>code</code>
   - <s>strike trough</s>
   - <u>underline</u>
-  - <pre language="c++">code</pre>,
-2. Split the text into smaller, more digestible sections. Use "----" as a separator between these sections. This will make the text easier to read on a mobile device. Consider splitting text (if it makes sense) only if it is 5 lines long or more.
-3. When creating lists, always use numbered lists.
-4. Preserve the original meaning of the text. Your task is to reformat without changing its original message details.
-5. Optimize the text for mobile phone screen size. This includes:
+  - <pre language="c++">code</pre>
+2. Replace single or double quoted text to bold markdown. Example: "**TEXT**" should become "<b>TEXT<b>".
+3. Split the text into smaller, more digestible sections. Use "----" as a separator between these sections. This will make the text easier to read on a mobile device. Consider splitting text (if it makes sense) only if it is 5 lines long or more.
+4. When creating lists, always use numbered lists.
+5. Preserve the original meaning of the text. Your task is to reformat without changing its original message details.
+6. Optimize the text for mobile phone screen size. This includes:
   - simplifying long paragraphs into a bit shorter ones
   - use simple, down to earth language that is easy to read and to understand
   - adjusting line breaks for better readability
   - adding emojis to replace common words and emphasize topic point
-6. Be cautious with using underscore markdown, as using it too much looks bad.
+7. Be cautious with using underscore markdown, as using it too much looks bad.
 
 
 ---
