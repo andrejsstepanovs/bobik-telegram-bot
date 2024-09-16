@@ -119,7 +119,18 @@ def main() -> None:
                         Please, analyze this conversation that you have been given and find information about the {user_name} 
                         that you believe will not change in the next half a year or so. 
                         Take note more on what {user_name} is saying and less on what {ai_name} is answering with.
-                        This could be his preferences, habits, responsibilities, family situation, family member habits or opinions, everyday life patterns and similar important things 
+                        This could be
+                        - preferences
+                        - habits
+                        - responsibilities
+                        - family situation
+                        - family member habits 
+                        - family member opinions
+                        - everyday life patterns
+                        - interaction or conversation preferences
+                        - interaction or conversation rules
+                        - preferences of how {ai_name} should answer
+                        and similar important things 
                         that will help other {ai_name} to come up with more accurate answers that are catered to {user_name}.
                         Please answer only with the things you found in provided chat history below. 
                         Answer with word "Nothing", if there is nothing that matches the job criteria. No yapping! 
