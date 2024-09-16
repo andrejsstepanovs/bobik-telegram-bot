@@ -202,14 +202,26 @@ def main() -> None:
         app.get_manager().clear_memory()
         asyncio.run(app.answer(questions=[use_model_summary, "llm"]))
         app.settings.history.enabled = False
-        long_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about long term knowledge.")
+       
+        long_term_summarize_prompt = summarize_prompt.replace("__extra__", f"""You are concerned only about long term knowledge like: 
+            - preferences
+            - habits
+            - responsibilities
+            - family situation
+            - family member habits 
+            - family member opinions
+            - everyday life patterns
+            - interaction or conversation preferences
+            - interaction or conversation rules
+            - preferences of how {ai_name} should answer
+            and similar important things.""")
         summary_result = asyncio.run(app.answer(questions=[long_term_summarize_prompt + "\n\n\n" + "\n".join(results["LONG_TERM_KNOWLEDGE"])]))
         long_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
         app.get_manager().clear_memory()
         asyncio.run(app.answer(questions=[use_model_summary, "llm"]))
         app.settings.history.enabled = False
-        short_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about short to mid term knowledge.")
+        short_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about short to mid term knowledge that is important to remember for few weeks or months.")
         summary_result = asyncio.run(app.answer(questions=[short_term_summarize_prompt + "\n\n\n" + "\n".join(results["SHORT_TERM_KNOWLEDGE"])]))
         short_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
