@@ -189,10 +189,20 @@ def main() -> None:
 
 
         summarize_prompt = f"""You {ai_name}, have been tasked with really important job of 
-                        organizing knowledge about {user_name}.
-                        You will be given summary of knowledge that other AI prepared for you to validate and improve it.
-                        Please, analyze the knowledge that you have been given and make it more organized and easier to understand.
-                        Combine similar information, remove duplicates, and make sure that all information is relevant and important.
+                        re-formatting information about {user_name}:
+                        - preferences
+                        - habits
+                        - responsibilities
+                        - family situation
+                        - family member habits 
+                        - family member opinions
+                        - everyday life patterns
+                        - interaction or conversation preferences
+                        - interaction or conversation rules
+                        - preferences of how {ai_name} should answer
+                        and similar important things that will help other {ai_name} to come up with more accurate answers that are catered to {user_name}.
+                        You will be given information that other AI prepared for you to classify, organize and improve.
+                        Please, analyze given info carefully and combine similar information, remove duplicates, and make sure that all information is relevant and accurate.
                         __extra__
                         Make sure to remove outdated information (current date time is {current_time}). Do not remove datetime predictions from entries that need to stay.
                         No yapping! Enclose your answer in <FINAL_FACTS></FINAL_FACTS> tags. 
@@ -203,18 +213,7 @@ def main() -> None:
         asyncio.run(app.answer(questions=[use_model_summary, "llm"]))
         app.settings.history.enabled = False
        
-        long_term_summarize_prompt = summarize_prompt.replace("__extra__", f"""You are concerned only about long term knowledge like: 
-            - preferences
-            - habits
-            - responsibilities
-            - family situation
-            - family member habits 
-            - family member opinions
-            - everyday life patterns
-            - interaction or conversation preferences
-            - interaction or conversation rules
-            - preferences of how {ai_name} should answer
-            and similar important things.""")
+        long_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about long term points that will not change in next few weeks or months.")
         summary_result = asyncio.run(app.answer(questions=[long_term_summarize_prompt + "\n\n\n" + "\n".join(results["LONG_TERM_KNOWLEDGE"])]))
         long_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
