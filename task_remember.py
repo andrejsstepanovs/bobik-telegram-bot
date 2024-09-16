@@ -158,12 +158,10 @@ def main() -> None:
             app.settings.history.enabled = False
             response_long_term = asyncio.run(app.answer(questions=[prompt_long_term]))
             app.get_manager().clear_memory()
-            time.sleep(60)
 
             asyncio.run(app.answer(questions=[use_model, "llm"]))
             app.settings.history.enabled = False
             response_short_term = asyncio.run(app.answer(questions=[prompt_short_term]))
-            time.sleep(60)
 
             print("RESPONSE_LONG_TERM\n", response_long_term)
             print("RESPONSE_SHORT_TERM\n", response_short_term)
@@ -195,7 +193,6 @@ def main() -> None:
         app.settings.history.enabled = False
         long_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about long term knowledge.")
         summary_result = asyncio.run(app.answer(questions=[long_term_summarize_prompt + "\n\n\n" + "\n".join(results["LONG_TERM_KNOWLEDGE"])]))
-        time.sleep(60)
         long_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
         app.get_manager().clear_memory()
@@ -203,7 +200,6 @@ def main() -> None:
         app.settings.history.enabled = False
         short_term_summarize_prompt = summarize_prompt.replace("__extra__", "You are concerned only about short to mid term knowledge.")
         summary_result = asyncio.run(app.answer(questions=[short_term_summarize_prompt + "\n\n\n" + "\n".join(results["SHORT_TERM_KNOWLEDGE"])]))
-        time.sleep(60)
         short_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
 
