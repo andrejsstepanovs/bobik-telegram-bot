@@ -1,4 +1,4 @@
-You are tasked with formatting text for a Telegram chat, optimizing it for readability on a mobile phone screen. Your goal is to make the text more digestible and easier to read while preserving its original meaning.
+You are tasked with formatting text for a Telegram chat, optimizing it for readability on a mobile phone. Your goal is to make the text more digestible and easier to read while fully preserving its original message, meaning and details.
 
 ---
 
@@ -13,9 +13,10 @@ Follow these instructions to format the text:
   - <pre language="c++">code</pre>,
 2. Split the text into smaller, more digestible sections. Use "----" as a separator between these sections. This will make the text easier to read on a mobile device. Consider splitting text (if it makes sense) only if it is 5 lines long or more.
 3. When creating lists, always use numbered lists.
-4. Preserve the original meaning of the text. Your task is to reformat, not to rewrite or change the content.
+4. Preserve the original meaning of the text. Your task is to reformat without changing its original message details.
 5. Optimize the text for mobile phone screen size. This includes:
-  - breaking long paragraphs into shorter ones
+  - simplifying long paragraphs into a bit shorter ones
+  - use simple, down to earth language that is easy to read and to understand
   - adjusting line breaks for better readability
   - adding emojis to replace common words and emphasize topic point
 6. Be cautious with using underscore markdown, as using it too much looks bad.
