@@ -12,5 +12,6 @@ bobik:
           use_model_summary: opus
           target: /path/to/prompts/remember_knowledge.md
           proactive: True
+          proactive_file: /path/to/user_proactive.json
     helper:
         config: bobik_dumb.yaml
