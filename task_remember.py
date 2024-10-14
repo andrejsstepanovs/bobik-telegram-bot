@@ -25,7 +25,7 @@ warnings.warn = lambda *args, **kwargs: None
 
 
 yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "task_telegram.yaml")
-with open(yaml_file, 'r') as file:
+with open(yaml_file, "r") as file:
     config = yaml.safe_load(file)
 
 current_dir = os.path.dirname(os.path.abspath(__file__)) # absolute path to where symlink file is located
@@ -42,7 +42,7 @@ def main() -> None:
     for u in config['bobik']['users']:
         app = None
         del app
-        app: App = App(config_file=os.path.join(current_dir, u['config']))
+        app: App = App(config_file=os.path.join(current_dir, u["config"]))
         if not app.settings.history.enabled:
             print(f"History disabled for {u['name']}")
             continue
@@ -56,17 +56,17 @@ def main() -> None:
             print(f"User {u['name']} history file {file} missing")
             continue
 
-        if not u['remember']['enabled']:
+        if not u["remember"]["enabled"]:
             print(f"User {u['name']} remember feature is disabled")
             continue
 
-        use_model = u['remember']['use_model']
-        use_model_summary = u['remember']['use_model_summary']
-        target_file = u['remember']['target']
+        use_model = u["remember"]["use_model"]
+        use_model_summary = u["remember"]["use_model_summary"]
+        target_file = u["remember"]["target"]
         print(f"Proceed: user {u['name']} history file {history_file}, use '{use_model}' model, target: {target_file}")
 
         # retrieve old info out of the file. Retrieve everything within <long_term_knowledge></long_term_knowledge> and <short_term_knowledge></short_term_knowledge> tags.
-        with open(target_file, 'r') as f:
+        with open(target_file, "r") as f:
             content = f.read()
         long_term_knowledge = extract_between_tags(content, "<long_term_knowledge>", "</long_term_knowledge>")
         short_term_knowledge = extract_between_tags(content, "<short_term_knowledge>", "</short_term_knowledge>")
@@ -76,7 +76,7 @@ def main() -> None:
 
 
         lines = []
-        with open(history_file, 'r') as f:
+        with open(history_file, "r") as f:
             lines = f.readlines()
         print(f"Total lines = {len(lines)}")
 
@@ -207,8 +207,8 @@ def main() -> None:
         short_term_summary_all = extract_between_tags(summary_result, "<FINAL_FACTS>", "</FINAL_FACTS>")
 
 
-        template_file = os.path.join(current_bot_dir, 'prompts', 'remember_knowledge_template.md')
-        with open(template_file, 'r') as f:
+        template_file = os.path.join(current_bot_dir, "prompts", "remember_knowledge_template.md")
+        with open(template_file, "r") as f:
             template = f.read()
 
         template = template.replace("{user_name}", user_name)
@@ -217,10 +217,10 @@ def main() -> None:
         template = template.replace("{SHORT_TERM_KNOWLEDGE}", short_term_summary_all)
 
         print(template)
-        with open(target_file, 'w') as f:
+        with open(target_file, "w") as f:
             f.write(template)
 
-        with open(history_file, 'w') as f:
+        with open(history_file, "w") as f:
             f.write("")
 
 
