@@ -1,6 +1,8 @@
 import os
 import re
 import pycron
+from datetime import datetime
+import arrow
 
 
 def extract_and_split(text, start_tag="<formatted_text>", end_tag="</formatted_text>", delimiter="----"):
@@ -28,11 +30,17 @@ def format_response_prompt(replacement_text: str, current_dir: str) -> str:
         question = content.replace("{{TEXT_TO_FORMAT}}", replacement_text)
         return question
 
-def get_entries_to_execute(config):
+def get_entries_to_execute(config, user_timezone):
+    now = datetime.now()
+    if user_timezone is None:
+        user_timezone = "local"
+    atime = arrow.get(now)
+    user_time = atime.to(user_timezone)
+
     entries_to_execute = []
     for category, entries in config.items():
         for entry in entries:
-            if pycron.is_now(entry["schedule"]):
+            if pycron.is_now(s=entry["schedule"], dt=user_time):
                 entries_to_execute.append({
                     "prompt": entry["prompt"],
                     "schedule": entry["schedule_human"],

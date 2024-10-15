@@ -44,6 +44,7 @@ class TelegramBot:
         self._bobik_apps = {}
         self.CONFIGURED_USERNAMES = self.get_configured_usernames()
         self.setup_logging()
+        self.jobs = {}
 
     def load_config(self):
         yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "task_telegram.yaml")
@@ -147,13 +148,14 @@ class TelegramBot:
                 cron_config = file.read()
             cron_dict = json.loads(cron_config)
 
-            entries = get_entries_to_execute(cron_dict)
+            user_timezone = self.bobik(username).settings.user.timezone
+            entries = get_entries_to_execute(cron_dict, user_timezone)
             if len(entries) == 0:
                 return
             prompts = []
             for entry in entries:
-                print("Found and executing proactive prompt:", entry["topic"], entry["schedule"], entry["prompt"])
-                prompts.append(f"Proactive schedule: {entry['schedule']}. Topic: {entry['topic']} and prompt: {entry['prompt']}")
+                print(f"Found and executing proactive prompt:", entry["prompt"])
+                prompts.append(f"Proactive schedule: {entry['schedule']}. Topic: {entry['topic']} and Prompt: {entry['prompt']}")
             text = "\n".join(prompts)
             prompt = f"""You are an AI assistant tasked with creating proactive messages for users. These messages are not responses to direct questions, but rather unprompted information or suggestions that users will receive spontaneously. Your goal is to craft these messages in a way that feels natural, helpful, and engaging.
 
@@ -220,10 +222,12 @@ class TelegramBot:
 
         for user in self.CONFIGURED_USERNAMES:
             if user["name"] == username and user["proactive"]:
-                #update.effective_chat.id
-                job_minute = context.job_queue.run_repeating(self.proactive_message, interval=60, first=10, chat_id=update.message.chat_id, data={'user': username})
-                # job_minute.enabled = False  # Temporarily disable this job
-                await update.message.reply_text("✅ Job started")
+                if username not in self.jobs:
+                    self.jobs[username] = context.job_queue.run_repeating(self.proactive_message, interval=60, first=10, chat_id=update.message.chat_id, data={'user': username})
+                    # self.jobs[username].enabled = False  # Temporarily disable this job
+                    await update.message.reply_text("✅ Proactive job started")
+                else:
+                    await update.message.reply_text("✅ Proactive job already running")
             else:
                 self.logger.info(f"Proactive messages are disabled for {user['name']}")
 
