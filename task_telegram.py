@@ -8,17 +8,17 @@ import logging
 import os
 import time
 import yaml
+import traceback
 from typing import Final, List
 import asyncio
 import nest_asyncio
 import warnings
-
+import json
 warnings.warn = lambda *args,**kwargs: None
 from src.app import App
 warnings.warn = lambda *args, **kwargs: None
-
 from telegram import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup, Update
-from utils import extract_and_split, format_response_prompt
+from utils import extract_and_split, format_response_prompt, get_entries_to_execute
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -133,12 +133,61 @@ class TelegramBot:
         await self.handle_text_message(update.message.text, update, context)
 
     async def proactive_message(self, context: ContextTypes.DEFAULT_TYPE):
+        username = context.job.data.get('user', 'there')
         try:
-            user = context.job.data.get('user', 'there')
-            message = f"Proactive message to {user}! 🌞 Have a great day!"
-            await context.bot.send_message(chat_id=context.job.chat_id, text=message)
+            config = False
+            for a in self.config["bobik"]["users"]:
+                if a["name"] == username:
+                    config = a
+            if config and not config['proactive']:
+                return
+
+            print("Using proactive_file:", config['proactive_file'])
+            with open(config['proactive_file'], "r") as file:
+                cron_config = file.read()
+            cron_dict = json.loads(cron_config)
+
+            entries = get_entries_to_execute(cron_dict)
+            if len(entries) == 0:
+                return
+            prompts = []
+            for entry in entries:
+                print("Found and executing proactive prompt:", entry["topic"], entry["schedule"], entry["prompt"])
+                prompts.append(f"Proactive schedule: {entry['schedule']}. Topic: {entry['topic']} and prompt: {entry['prompt']}")
+            text = "\n".join(prompts)
+            prompt = f"""You are an AI assistant tasked with creating proactive messages for users. These messages are not responses to direct questions, but rather unprompted information or suggestions that users will receive spontaneously. Your goal is to craft these messages in a way that feels natural, helpful, and engaging.
+
+                        You will be given a topic for the proactive message. Here is the topic:
+
+                        <proactive_topic>
+                        {text}
+                        </proactive_topic>
+
+                        Based on this topic, formulate a proactive message that a user might find interesting or useful. Remember, the user has not triggered this via direct question for this information, so your message should be phrased as an unsolicited but welcome piece of information.
+
+                        Follow these guidelines when crafting your message:
+
+                        1. Start with a friendly, attention-grabbing opening that introduces the topic naturally.
+                        2. Be concise but informative.
+                        3. Include a brief explanation of why this information might be relevant or useful to the user.
+                        4. End with a soft call-to-action or a question that encourages engagement, but don't be pushy.
+                        5. Ensure the message feels spontaneous and not like a response to a query.
+
+                        Remember, you're not responding to a user's question, but rather initiating a conversation on this topic. Frame your message accordingly.
+                        Answer with the message that will be delivered to the user so no yapping, answer with only what needs to be sent to user.\n"""
+
+            prompt_message = []
+            for line in prompt.split("\n"):
+                prompt_message.append(line.lstrip())
+
+            chat_id = context.job.chat_id
+            await context.bot.send_chat_action(chat_id=chat_id, action="typing")
+            answers = await self.handle_response(username, "\n".join(prompt_message))
+            for answer in answers:
+                await context.bot.send_message(chat_id=chat_id, text=answer, parse_mode="HTML")
         except Exception as e:
             self.logger.error(f"Failed to send proactive message: {str(e)}")
+            traceback.print_exc()
 
     async def task_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         username = update.message.from_user.username

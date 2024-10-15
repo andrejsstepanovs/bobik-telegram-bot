@@ -1,5 +1,7 @@
 import os
 import re
+import pycron
+
 
 def extract_and_split(text, start_tag="<formatted_text>", end_tag="</formatted_text>", delimiter="----"):
     # Use regex for more robust tag matching
@@ -25,3 +27,15 @@ def format_response_prompt(replacement_text: str, current_dir: str) -> str:
         content: str = f.read()
         question = content.replace("{{TEXT_TO_FORMAT}}", replacement_text)
         return question
+
+def get_entries_to_execute(config):
+    entries_to_execute = []
+    for category, entries in config.items():
+        for entry in entries:
+            if pycron.is_now(entry["schedule"]):
+                entries_to_execute.append({
+                    "prompt": entry["prompt"],
+                    "schedule": entry["schedule_human"],
+                    "topic": category,
+                })
+    return entries_to_execute
