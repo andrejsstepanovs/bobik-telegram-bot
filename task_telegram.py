@@ -174,6 +174,8 @@ class TelegramBot:
                         3. Include a brief explanation of why this information might be relevant or useful to the user.
                         4. End with a soft call-to-action or a question that encourages engagement, but don't be pushy.
                         5. Ensure the message feels spontaneous and not like a response to a query.
+                        6. Don't ask user for any follow up questions.
+                        7. Answer with single word "Nothing" (without quotes), if you have nothing reasonably important to say.
 
                         Remember, you're not responding to a user's question, but rather initiating a conversation on this topic. Frame your message accordingly.
                         Answer with the message that will be delivered to the user so no yapping, answer with only what needs to be sent to user.\n"""
@@ -186,7 +188,8 @@ class TelegramBot:
             await context.bot.send_chat_action(chat_id=chat_id, action="typing")
             answers = await self.handle_response(username, "\n".join(prompt_message))
             for answer in answers:
-                await context.bot.send_message(chat_id=chat_id, text=answer, parse_mode="HTML")
+                if answer != "Nothing":
+                    await context.bot.send_message(chat_id=chat_id, text=answer, parse_mode="HTML")
         except Exception as e:
             self.logger.error(f"Failed to send proactive message: {str(e)}")
             traceback.print_exc()
