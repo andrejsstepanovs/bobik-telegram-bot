@@ -16,3 +16,12 @@ even "<long_term_knowledge>" is less relevant if it contradicts information in "
 <short_term_knowledge>
 {SHORT_TERM_KNOWLEDGE}
 </short_term_knowledge>
+
+# History knowledge about {user_name}
+Here is documented history about interactions, events and similar actions.
+This information should be used to save important things that happened 
+and will help you to be more precise in future dialogue with {user_name}.
+
+<history_knowledge>
+{HISTORY_KNOWLEDGE}
+</history_knowledge>
