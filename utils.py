@@ -40,7 +40,16 @@ def get_entries_to_execute(config, user_timezone):
     entries_to_execute = []
     for category, entries in config.items():
         for entry in entries:
-            if pycron.is_now(s=entry["schedule"], dt=user_time):
+            schedule = entry["schedule"]
+            parts = schedule.split(" ")
+            if len(schedule.split(" ")) == 6:
+                current_year = str(user_time.year)
+                if parts[5] != current_year:
+                    continue
+                schedule = " ".join(parts[:5])
+            print("schedule", schedule)
+
+            if pycron.is_now(s=schedule, dt=user_time):
                 entries_to_execute.append({
                     "prompt": entry["prompt"],
                     "schedule": entry["schedule_human"],
