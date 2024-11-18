@@ -89,7 +89,7 @@ class TelegramBot:
                 return ["Sorry, I broke. 😢"]
 
             format_prompt = format_response_prompt(response, self.current_dir)
-            response = await self.bobik("helper").answer(questions=["gpt " + format_prompt])
+            response = await self.bobik("helper").answer(questions=["tiny " + format_prompt])
             print(response)
             answers = extract_and_split(text=response)
 
