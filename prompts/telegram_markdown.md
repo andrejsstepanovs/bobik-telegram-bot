@@ -11,7 +11,7 @@ Follow these instructions to format the text:
   - <s>strike trough</s>
   - <u>underline</u>
   - <pre language="c++">code</pre>,
-2. Split the text into smaller, more digestible sections. Use "----" as a separator between these sections. This will make the text easier to read on a mobile device. Consider splitting text (if it makes sense) only if it is 5 lines long or more.
+2. Split the text into smaller sections based on paragraph topic. Use "----" as a separator between these sections. This will make the text easier to read on a mobile device. Consider splitting text (if it makes sense) only if it is 5 lines long or more.
 3. When creating lists, always use numbered lists.
 4. Preserve the original meaning of the text. Your task is to reformat, not to rewrite or change the content.
 5. Optimize the text for mobile phone screen size. This includes:
