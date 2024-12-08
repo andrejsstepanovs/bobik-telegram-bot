@@ -266,7 +266,7 @@ def main() -> None:
                     results["SHORT_TERM_KNOWLEDGE"].append(resp)
                 if "Nothing" not in response_history:
                     resp = extract_between_tags(response_short_term, "<HISTORY_KNOWLEDGE_FACTS>", "</HISTORY_KNOWLEDGE_FACTS>")
-                    results["HISTORY_KNOWLEDGE_FACTS"].append(resp)
+                    results["HISTORY_KNOWLEDGE"].append(resp)
 
             if process_proactive and proactive and "Nothing" not in response_proactive_term:
                 resp = extract_between_tags(response_proactive_term, "<PROACTIVE_TOPICS>", "</PROACTIVE_TOPICS>")
