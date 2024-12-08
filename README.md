@@ -19,6 +19,7 @@ git clone https://github.com/andrejsstepanovs/bobik.git
 cd ~
 git clone https://github.com/andrejsstepanovs/bobik-telegram-bot.git
 ln -s ../bobik-telegram-bot/task_telegram.py bobik/task_telegram.py
+ln -s ../bobik-telegram-bot/task_remember.py bobik/task_remember.py
 ln -s ../../bobik-telegram-bot/prompts/telegram_markdown.md bobik/prompts/telegram_markdown.md
 
 cd bobik-telegram-bot
