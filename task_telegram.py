@@ -172,7 +172,7 @@ class TelegramBot:
                         1. Start with a friendly, attention-grabbing opening that introduces the topic naturally.
                         2. Be concise but informative.
                         3. Include a brief explanation of why this information might be relevant or useful to the user.
-                        4. End with a soft call-to-action or a question that encourages engagement, but don't be pushy.
+                        4. End with a soft not pushy call-to-action (if applicable) without using any follow up questions.
                         5. Ensure the message feels spontaneous and not like a response to a query.
                         6. Don't ask user for any follow up questions.
                         7. No yapping, dont explain your reasoning or clarify your answer with any unnecessary text.
