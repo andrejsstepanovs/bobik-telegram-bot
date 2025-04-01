@@ -30,6 +30,7 @@ from telegram.ext import (
     CallbackContext,
     JobQueue
 )
+from telegram.error import NetworkError, TelegramError
 from datetime import time, timezone
 from deepgram import (
     DeepgramClient,
@@ -323,7 +324,13 @@ class TelegramBot:
         await update.message.reply_text("✅ Memory cleared")
 
     async def error(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        print(f"Update {update} caused error {context.error}")
+        error_msg = f"Update {update} caused error {context.error}"
+        self.logger.error(error_msg)
+
+        if isinstance(context.error, NetworkError):
+            self.logger.warning("Network error detected. Will attempt to reconnect...")
+        elif isinstance(context.error, TelegramError):
+            self.logger.error(f"Telegram API error: {context.error}")
 
     async def get_user_id(self, username):
         try:
@@ -337,26 +344,57 @@ class TelegramBot:
         """Run the bot."""
         nest_asyncio.apply()
 
-        print("Starting Bobik Bot...")
-        self.application = Application.builder().token(self.config['telegram']['token']).build()
+        max_retries = 99
+        retry_count = 0
+        retry_delay = 5  # seconds
 
-        # Commands
-        self.application.add_handler(CommandHandler('clear', self.clear_command))
-        self.application.add_handler(CommandHandler('info', self.info_command))
-        self.application.add_handler(CommandHandler('restart', self.restart_command))
-        self.application.add_handler(CommandHandler('agent', self.toggle_agent_command))
-        self.application.add_handler(CommandHandler('start', self.task_command))
-        self.application.add_handler(CommandHandler('task', self.task_command))
+        while retry_count < max_retries:
+            try:
+                print("Starting Bobik Bot...")
+                self.application = Application.builder().token(self.config['telegram']['token']).build()
 
-        # Messages
-        self.application.add_handler(MessageHandler(filters.TEXT, self.handle_message))
-        self.application.add_handler(MessageHandler(filters.VOICE, self.handle_voice))
-        self.application.add_handler(MessageHandler(filters.PHOTO, self.handle_image))
+                # Commands
+                self.application.add_handler(CommandHandler('clear', self.clear_command))
+                self.application.add_handler(CommandHandler('info', self.info_command))
+                self.application.add_handler(CommandHandler('restart', self.restart_command))
+                self.application.add_handler(CommandHandler('agent', self.toggle_agent_command))
+                self.application.add_handler(CommandHandler('start', self.task_command))
+                self.application.add_handler(CommandHandler('task', self.task_command))
 
-        # Errors
-        self.application.add_error_handler(self.error)
+                # Messages
+                self.application.add_handler(MessageHandler(filters.TEXT, self.handle_message))
+                self.application.add_handler(MessageHandler(filters.VOICE, self.handle_voice))
+                self.application.add_handler(MessageHandler(filters.PHOTO, self.handle_image))
 
-        self.application.run_polling(poll_interval=3)
+                # Errors
+                self.application.add_error_handler(self.error)
+
+                # Run the bot
+                self.application.run_polling(poll_interval=3, drop_pending_updates=True) # do not process old messages
+
+                # If we get here, the bot was stopped gracefully
+                break
+
+            except NetworkError as e:
+                retry_count += 1
+                self.logger.error(f"Network error: {e}. Retry {retry_count}/{max_retries}")
+                time.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 60)  # Exponential backoff, max 60 seconds
+
+            except TelegramError as e:
+                retry_count += 1
+                self.logger.error(f"Telegram error: {e}. Retry {retry_count}/{max_retries}")
+                time.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 120)  # Exponential backoff, max 120 seconds
+
+            except Exception as e:
+                self.logger.error(f"Unexpected error: {e}")
+                traceback.print_exc()
+                retry_count += 1
+                time.sleep(retry_delay * 2)  # Longer delay for unexpected errors
+
+        if retry_count >= max_retries:
+            self.logger.critical("Maximum retry attempts reached. Giving up.")
 
 def main():
     bot = TelegramBot()
