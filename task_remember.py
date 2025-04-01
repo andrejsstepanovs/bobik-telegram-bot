@@ -182,12 +182,12 @@ def main() -> None:
                         You will be given parts of conversation history. It will contain time when conversation happened, who was talking and what was said.
                         Please, analyze this conversation that you have been given and locate important events and actions that happened with {user_name} 
                         that you believe is important to remember for other {ai_name} for next few months.
-                        Take note more only on what {user_name} stated and ignore {ai_name} answers. 
-                        This could be {user_name} situations that happened with him or events that played a big role in {user_name} life. 
+                        Focus more on what {user_name} stated and ignore {ai_name} answers. 
+                        This could be {user_name} fitness exercise, situations that happened with {user_name} or events that played a big role in {user_name} life. 
                         This information will help other {ai_name} to be more precise in future interactions with {user_name}. 
-                        Ignore any information that can be labeled as re-occurring as this info will be tackled by other processes.
+                        Ignore any information that can be labeled as re-occurring (except fitness) as this info will be tackled by other processes.
                         Please answer only with the things you found in provided chat history below. Answer with word "Nothing", if there is nothing that matches the job criteria.
-                        Answer with list together with date when event took place.
+                        Answer with a list of events with a date when event took place.
                         No yapping, dont explain your reasoning or clarify your answer with any unnecessary text!
                         Enclose your answered list in <HISTORY_KNOWLEDGE_FACTS></HISTORY_KNOWLEDGE_FACTS> tags. 
                         *Example*: ```<HISTORY_KNOWLEDGE_FACTS>- 2024-10-24 {user_name} twisted his ankle.\n- 2024-10-29 {user_name} had dispute with Vik.\n- 2024-11-02 {user_name} car broke down on a way home.\n- 2024-11-05 till 2024-11-07 {user_name} was feeling weak and sick.\n</HISTORY_KNOWLEDGE_FACTS>```
