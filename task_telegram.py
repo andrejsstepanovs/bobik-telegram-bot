@@ -122,10 +122,9 @@ class TelegramBot:
         print(f"User ({update.message.chat.id}) in {message_type}: \"{text}\"")
 
         try:
-            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-
             answers = ["Sorry, I can't help you."]
             if update.message.from_user.username in [user["name"] for user in self.CONFIGURED_USERNAMES] and message_type == "private":
+                await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
                 if update.message.reply_to_message:
                     text += "\n\n<quoted_text>" + update.message.reply_to_message.text + "</quoted_text>"
                 answers = await self.handle_response(update.message.from_user.username, text)
