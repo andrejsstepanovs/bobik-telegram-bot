@@ -14,6 +14,7 @@ import asyncio
 import nest_asyncio
 import warnings
 import json
+import re
 warnings.warn = lambda *args,**kwargs: None
 from src.app import App
 warnings.warn = lambda *args, **kwargs: None
@@ -109,6 +110,14 @@ class TelegramBot:
             await context.bot.send_chat_action(chat_id=chat_id, action='typing')
             await asyncio.sleep(5)
 
+    def extract_mp3_path(self, text):
+        # This pattern looks for text that starts with 'mp3/' and ends with '.mp3'
+        pattern = r'mp3\/[^\s"\']+\.mp3'
+        match = re.search(pattern, text)
+        if match:
+            return match.group(0)
+        return None
+
     async def respond(self, answers: list, update: Update):
         for text in answers:
             try:
@@ -116,6 +125,18 @@ class TelegramBot:
             except Exception as e:
                 print("failed html reply err:", e)
                 await update.message.reply_text(text)
+
+            if ".mp3" in text.lower():
+                mp3_file = self.extract_mp3_path(text)
+                mp3_file = os.path.join(self.current_dir, mp3_file)
+                print("MP3 file:", mp3_file)
+
+                if os.path.exists(mp3_file):
+                    with open(mp3_file, "rb") as audio:
+                        await update.message.reply_voice(voice=audio)
+                else:
+                    self.logger.error(f"MP3 file {mp3_file} does not exist.")
+                    print(f"MP3 file {mp3_file} does not exist.")
 
     async def handle_text_message(self, text: str, update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_type: str = update.message.chat.type
