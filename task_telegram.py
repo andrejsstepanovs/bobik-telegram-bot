@@ -46,6 +46,8 @@ class TelegramBot:
         self.CONFIGURED_USERNAMES = self.get_configured_usernames()
         self.setup_logging()
         self.jobs = {}
+        self.processed_messages = set()  # Track processed message IDs
+        self.message_lock = asyncio.Lock()  # Prevent race conditions
 
     def load_config(self):
         yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "task_telegram.yaml")
@@ -86,18 +88,20 @@ class TelegramBot:
     async def handle_response(self, user: str, question: str):
         try:
             response = await self.bobik(user).answer(questions=[question])
+            self.logger.info(f"Response: {response}")
             if response == "":
                 return ["Sorry, I broke. 😢"]
 
             format_prompt = format_response_prompt(response, self.current_dir)
             response = await self.bobik("helper").answer(questions=["tiny " + format_prompt])
-            print(response)
+            self.logger.info(f"Response: {response}")
             answers = extract_and_split(text=response)
 
             return answers
         except KeyboardInterrupt:
             quit(1)
         except Exception as e:
+            traceback.print_exc()
             return [f"Error: {e}"]
 
     async def send_typing_action(self, context, chat_id):
@@ -127,11 +131,22 @@ class TelegramBot:
                 answers = await self.handle_response(update.message.from_user.username, text)
 
         except Exception as e:
+            traceback.print_exc()
+            self.logger.error(f"Error processing message: {e}")
             answers = [f"Error: {e}"]
 
         await self.respond(answers, update)
 
     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        # Simple cleanup - clear set if it gets too big
+        async with self.message_lock:
+            if len(self.processed_messages) > 1000:  # Arbitrary limit
+                self.processed_messages = set()
+                
+            if update.message.message_id in self.processed_messages:
+                return
+            self.processed_messages.add(update.message.message_id)
+        
         await self.handle_text_message(update.message.text, update, context)
 
     async def proactive_message(self, context: ContextTypes.DEFAULT_TYPE):
@@ -370,7 +385,7 @@ class TelegramBot:
                 self.application.add_error_handler(self.error)
 
                 # Run the bot
-                self.application.run_polling(poll_interval=3, drop_pending_updates=True) # do not process old messages
+                self.application.run_polling(poll_interval=3, drop_pending_updates=True, timeout=20) # do not process old messages
 
                 # If we get here, the bot was stopped gracefully
                 break
